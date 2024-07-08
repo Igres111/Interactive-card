@@ -3,6 +3,7 @@ import bg_mobile from "/images/bg-main-mobile.png";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
+import InputMask from "react-input-mask";
 type Inputs = {
   name: string;
   number: string;
@@ -24,10 +25,21 @@ function App() {
       .string()
       .required("Can’t be blank")
       .min(16, "Number must contain 16 digits"),
+    month: yup
+      .string()
+      .required("Can’t be blank")
+      .test(
+        "range",
+        "must be valid number",
+        (value) => Number(value) > 0 && Number(value) <= 12
+      ),
+    year: yup.string().required("Can’t be blank"),
+    cvc: yup.string().required("Can’t be blank"),
   });
 
   const {
     register,
+    setValue,
     handleSubmit,
     watch,
     formState: { errors },
@@ -48,21 +60,41 @@ function App() {
       </div>
       <div>
         <h4>Card Number</h4>
-        <input
+        <InputMask
+          mask="9999 9999 9999 9999"
+          maskChar=""
           type="string"
           placeholder="e.g. 1234 5678 9123 0000"
           {...register("number")}
-        ></input>
+        />
       </div>
       <div>
         <h4>Exp. Date (MM/YY)</h4>
         <div>
-          <input type="text" placeholder="MM" {...register("month")} />
-          <input type="text" placeholder="YY" {...register("year")} />
+          <InputMask
+            mask="99"
+            maskChar=""
+            type="text"
+            placeholder="MM"
+            {...register("month")}
+          />
+          <InputMask
+            mask="9999"
+            maskChar=""
+            type="text"
+            placeholder="YY"
+            {...register("year")}
+          />
         </div>
         <div>
           <h4>CVC</h4>
-          <input type="text" placeholder="e.g. 123" {...register("cvc")} />
+          <InputMask
+            mask="999"
+            maskChar=""
+            type="text"
+            placeholder="e.g. 123"
+            {...register("cvc")}
+          />
         </div>
       </div>
       <button type="submit">Confirm</button>
