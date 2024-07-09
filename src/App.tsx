@@ -6,6 +6,7 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import InputMask from "react-input-mask";
+import Congrats from "./Congrats";
 type Inputs = {
   name: string;
   number: string;
@@ -17,9 +18,11 @@ type Inputs = {
 const cardRegex =
   /^(?:4[0-9]{12}(?:[0-9]{3})?|5[1-5][0-9]{14}|6(?:011|5[0-9]{2})[0-9]{12}|3[47][0-9]{13}|3(?:0[0-5]|[68][0-9])[0-9]{11}|(?:2131|1800|35\d{3})\d{11})$/;
 
-const currYear = Number(new Date().getFullYear().toString().slice(2));
+const currYear = new Date().getFullYear();
 
 function App() {
+  const [complete, setComplete] = useState<boolean>(false);
+
   const schema = yup.object({
     name: yup
       .string()
@@ -58,7 +61,15 @@ function App() {
     watch,
     formState: { errors },
   } = useForm<Inputs>({ resolver: yupResolver(schema) });
-  const onSubmit: SubmitHandler<Inputs> = (data) => console.log(data);
+  const onSubmit: SubmitHandler<Inputs> = (data) => {
+    setComplete(true);
+    console.log(data);
+  };
+  const name = watch("name");
+  const number = watch("number");
+  const month = watch("month");
+  const year = watch("year");
+  const cvc = watch("cvc");
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="h-screen w-screen">
@@ -70,7 +81,11 @@ function App() {
           className="bg-cover bg-center w-[286px] h-[157px] ml-[73px] pr-[36px] flex items-center justify-end"
           style={{ backgroundImage: `url(${back_card})` }}
         >
-          <span className="text-white text-[9px] font-medium"> 00000</span>
+          {!cvc ? (
+            <span className="text-white text-[9px] font-medium">000</span>
+          ) : (
+            <span className="text-white text-[9px] font-medium"> {cvc}</span>
+          )}
         </div>
         <div
           className="bg-cover bg-center w-[285px] h-[156px] ml-[17px] absolute top-0 mt-[120px] "
@@ -91,92 +106,110 @@ function App() {
             />
           </svg>
 
-          <p className="pt-[37px] ml-5 text-white">12312312</p>
+          {!number ? (
+            <p className="pt-[37px] ml-5 text-white">0000 0000 0000 0000</p>
+          ) : (
+            <p className="pt-[37px] ml-5 text-white">{number}</p>
+          )}
           <div className="flex justify-between pt-4 text-[9px] font-medium text-white">
-            <p className="ml-5">name</p>
-            <p className="mr-5">expiry</p>
+            {!name ? (
+              <p className="ml-5">JANE APPLESEED</p>
+            ) : (
+              <p className="ml-5">{name.toUpperCase()}</p>
+            )}
+            <p className="mr-5">
+              {month}
+              {month || year ? "/" : null}
+              {year}
+            </p>
           </div>
         </div>
       </div>
-      <div className="ml-6">
-        <div className="mt-[91px]">
-          <h4 className="text-Deep-Violet text-xs tracking-widest	">
-            CARDHOLDER NAME{" "}
-          </h4>
-          <input
-            className={`mt-[9px] border rounded-lg w-[327px] h-[45px] pl-4 focus:outline-none ${
-              errors.name ? "border-errors" : "border-Deep-Violet"
-            }`}
-            type="text"
-            placeholder="e.g. Jane Appleseed"
-            {...register("name")}
-          />
-          {errors.name && (
-            <p className="mt-2 text-errors text-xs ">{errors.name.message}</p>
-          )}
-        </div>
-        <div className="mt-5">
-          <h4 className="text-Deep-Violet text-xs tracking-widest	">
-            CARD NUMBER
-          </h4>
-          <InputMask
-            className={`mt-[9px] border rounded-lg w-[327px] h-[45px] pl-4 focus:outline-none ${
-              errors.name ? "border-errors" : "border-Deep-Violet"
-            }`}
-            mask="9999 9999 9999 9999"
-            maskChar=""
-            type="string"
-            placeholder="e.g. 1234 5678 9123 0000"
-            {...register("number")}
-          />
-          {errors.number && (
-            <p className="mt-2 text-errors text-xs">{errors.number.message}</p>
-          )}
-        </div>
-        <div className="mt-5 flex ">
-          <div className="flex flex-col">
+      {complete ? (
+        <Congrats />
+      ) : (
+        <div className="ml-6">
+          <div className="mt-[91px]">
             <h4 className="text-Deep-Violet text-xs tracking-widest	">
-              EXP. DATE (MM/YY)
+              CARDHOLDER NAME{" "}
             </h4>
-            <div className="flex mt-[9px]">
-              <InputMask
-                className="w-[72px] h-[45px] pl-4 border rounded-lg"
-                mask="99"
-                maskChar=""
-                type="text"
-                placeholder="MM"
-                {...register("month")}
-              />
-
-              <InputMask
-                className="w-[72px] h-[45px] pl-4 border rounded-lg ml-2 mr-[11px]"
-                mask="99"
-                maskChar=""
-                type="text"
-                placeholder="YY"
-                {...register("year")}
-              />
-            </div>
-            {errors.month && <p>{errors.month.message}</p>}
-          </div>
-          <div>
-            <h4 className="text-Deep-Violet text-xs tracking-widest	">CVC</h4>
-            <InputMask
-              className={`border rounded-lg mt-[9px] w-[164px] h-[45px] pl-4 ${
+            <input
+              className={`mt-[9px] border rounded-lg w-[327px] h-[45px] pl-4 focus:outline-none ${
                 errors.name ? "border-errors" : "border-Deep-Violet"
               }`}
-              mask="999"
-              maskChar=""
               type="text"
-              placeholder="e.g. 123"
-              {...register("cvc")}
+              placeholder="e.g. Jane Appleseed"
+              {...register("name")}
             />
-            {errors.cvc && (
-              <p className="mt-2 text-errors text-xs">{errors.cvc.message}</p>
+            {errors.name && (
+              <p className="mt-2 text-errors text-xs ">{errors.name.message}</p>
             )}
           </div>
+          <div className="mt-5">
+            <h4 className="text-Deep-Violet text-xs tracking-widest	">
+              CARD NUMBER
+            </h4>
+            <InputMask
+              className={`mt-[9px] border rounded-lg w-[327px] h-[45px] pl-4 focus:outline-none ${
+                errors.name ? "border-errors" : "border-Deep-Violet"
+              }`}
+              mask="9999 9999 9999 9999"
+              maskChar=""
+              type="string"
+              placeholder="e.g. 1234 5678 9123 0000"
+              {...register("number")}
+            />
+            {errors.number && (
+              <p className="mt-2 text-errors text-xs">
+                {errors.number.message}
+              </p>
+            )}
+          </div>
+          <div className="mt-5 flex ">
+            <div className="flex flex-col">
+              <h4 className="text-Deep-Violet text-xs tracking-widest	">
+                EXP. DATE (MM/YY)
+              </h4>
+              <div className="flex mt-[9px]">
+                <InputMask
+                  className="w-[72px] h-[45px] pl-4 border rounded-lg"
+                  mask="99"
+                  maskChar=""
+                  type="text"
+                  placeholder="MM"
+                  {...register("month")}
+                />
+
+                <InputMask
+                  className="w-[72px] h-[45px] pl-4 border rounded-lg ml-2 mr-[11px]"
+                  mask="99"
+                  maskChar=""
+                  type="text"
+                  placeholder="YY"
+                  {...register("year")}
+                />
+              </div>
+              {errors.month && <p>{errors.month.message}</p>}
+            </div>
+            <div>
+              <h4 className="text-Deep-Violet text-xs tracking-widest 	">CVC</h4>
+              <InputMask
+                className={`border rounded-lg mt-[9px] w-[164px] h-[45px] pl-4 focus:outline-none ${
+                  errors.name ? "border-errors" : "border-Deep-Violet"
+                }`}
+                mask="999"
+                maskChar=""
+                type="text"
+                placeholder="e.g. 123"
+                {...register("cvc")}
+              />
+              {errors.cvc && (
+                <p className="mt-2 text-errors text-xs">{errors.cvc.message}</p>
+              )}
+            </div>
+          </div>
         </div>
-      </div>
+      )}
       <button
         type="submit"
         className="mt-7 w-[327px] h-[53px] text-white bg-Deep-Violet ml-6 border rounded-lg "
