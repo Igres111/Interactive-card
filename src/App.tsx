@@ -16,15 +16,19 @@ type Inputs = {
 };
 
 const currYear = Number(new Date().getFullYear().toString().slice(2));
+const englishReg = /^[A-Za-z]+$/;
 
 function App() {
   const [complete, setComplete] = useState<boolean>(false);
-  console.log(complete);
+
   const schema = yup.object({
     name: yup
       .string()
       .required("Can’t be blank")
-      .max(30, "Can't be more than 30 digits"),
+      .max(30, "Can't be more than 30 digits")
+      .test("validation", "Must contain english letters", (value) =>
+        englishReg.test(value)
+      ),
     number: yup
       .string()
       .required("Can’t be blank")
@@ -113,11 +117,10 @@ function App() {
             {!number ? "0000 0000 0000 0000" : number}
           </p>
           <div className="flex justify-between pt-4 text-[9px] font-medium text-white">
-            {!name ? (
-              <p className="ml-5 tracking-widest">JANE APPLESEED</p>
-            ) : (
-              <p className="ml-5 tracking-widest	">{name.toUpperCase()}</p>
-            )}
+            <p className="ml-5 tracking-widest">
+              {!name ? "JANE APPLESEED" : name.toUpperCase()}
+            </p>
+
             <p className="mr-5 tracking-widest">
               {month ? month : "00"}/{year ? year : "00"}
             </p>
@@ -206,7 +209,7 @@ function App() {
               <h4 className="text-Deep-Violet text-xs tracking-widest 	">CVC</h4>
               <InputMask
                 className={`border rounded-lg mt-[9px] w-[164px] h-[45px] pl-4 focus:outline-none ${
-                  errors.name ? "border-errors" : "border-Deep-Violet"
+                  errors.cvc ? "border-errors" : "border-Deep-Violet"
                 }`}
                 mask="999"
                 maskChar=""
@@ -221,12 +224,14 @@ function App() {
           </div>
         </div>
       )}
-      <button
-        type="submit"
-        className="mt-7 w-[327px] h-[53px] text-white bg-Deep-Violet ml-6 border rounded-lg "
-      >
-        {complete ? "Continue" : "Confirm"}
-      </button>
+      {!complete && (
+        <button
+          type="submit"
+          className="mt-7 w-[327px] h-[53px] text-white bg-Deep-Violet ml-6 border rounded-lg "
+        >
+          Confirm
+        </button>
+      )}
     </form>
   );
 }
