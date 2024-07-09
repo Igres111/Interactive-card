@@ -15,14 +15,11 @@ type Inputs = {
   cvc: string;
 };
 
-const cardRegex =
-  /^(?:4[0-9]{12}(?:[0-9]{3})?|5[1-5][0-9]{14}|6(?:011|5[0-9]{2})[0-9]{12}|3[47][0-9]{13}|3(?:0[0-5]|[68][0-9])[0-9]{11}|(?:2131|1800|35\d{3})\d{11})$/;
-
-const currYear = new Date().getFullYear();
+const currYear = Number(new Date().getFullYear().toString().slice(2));
 
 function App() {
   const [complete, setComplete] = useState<boolean>(false);
-
+  console.log(complete);
   const schema = yup.object({
     name: yup
       .string()
@@ -31,9 +28,11 @@ function App() {
     number: yup
       .string()
       .required("Can’t be blank")
-      .min(16, "Number must contain 16 digits")
-      .test("validation", "Card number must be valid", (value) =>
-        cardRegex.test(value)
+      .min(19, "Number must contain 16 digits")
+      .test(
+        "validation",
+        "Card number must be valid",
+        (value) => !value.startsWith("5") || !value.startsWith("4")
       ),
     month: yup
       .string()
@@ -49,7 +48,7 @@ function App() {
       .test(
         "validation",
         "Invalid year",
-        (value) => Number(value) > currYear && Number(value) < currYear + 6
+        (value) => Number(value) >= currYear && Number(value) <= currYear + 6
       ),
     cvc: yup.string().required("Can’t be blank"),
   });
@@ -62,8 +61,7 @@ function App() {
     formState: { errors },
   } = useForm<Inputs>({ resolver: yupResolver(schema) });
   const onSubmit: SubmitHandler<Inputs> = (data) => {
-    setComplete(true);
-    console.log(data);
+    setComplete((value) => !value);
   };
   const name = watch("name");
   const number = watch("number");
@@ -82,9 +80,14 @@ function App() {
           style={{ backgroundImage: `url(${back_card})` }}
         >
           {!cvc ? (
-            <span className="text-white text-[9px] font-medium">000</span>
+            <span className="text-white text-[9px] font-medium tracking-widest	">
+              000
+            </span>
           ) : (
-            <span className="text-white text-[9px] font-medium"> {cvc}</span>
+            <span className="text-white text-[9px] font-medium tracking-widest	">
+              {" "}
+              {cvc}
+            </span>
           )}
         </div>
         <div
@@ -106,21 +109,17 @@ function App() {
             />
           </svg>
 
-          {!number ? (
-            <p className="pt-[37px] ml-5 text-white">0000 0000 0000 0000</p>
-          ) : (
-            <p className="pt-[37px] ml-5 text-white">{number}</p>
-          )}
+          <p className="pt-[37px] ml-5 text-white tracking-widest">
+            {!number ? "0000 0000 0000 0000" : number}
+          </p>
           <div className="flex justify-between pt-4 text-[9px] font-medium text-white">
             {!name ? (
-              <p className="ml-5">JANE APPLESEED</p>
+              <p className="ml-5 tracking-widest">JANE APPLESEED</p>
             ) : (
-              <p className="ml-5">{name.toUpperCase()}</p>
+              <p className="ml-5 tracking-widest	">{name.toUpperCase()}</p>
             )}
-            <p className="mr-5">
-              {month}
-              {month || year ? "/" : null}
-              {year}
+            <p className="mr-5 tracking-widest">
+              {month ? month : "00"}/{year ? year : "00"}
             </p>
           </div>
         </div>
@@ -134,7 +133,7 @@ function App() {
               CARDHOLDER NAME{" "}
             </h4>
             <input
-              className={`mt-[9px] border rounded-lg w-[327px] h-[45px] pl-4 focus:outline-none ${
+              className={`mt-[9px] border rounded-lg w-[327px] h-[45px] pl-4 focus:outline-Deep-Violet ${
                 errors.name ? "border-errors" : "border-Deep-Violet"
               }`}
               type="text"
@@ -151,7 +150,7 @@ function App() {
             </h4>
             <InputMask
               className={`mt-[9px] border rounded-lg w-[327px] h-[45px] pl-4 focus:outline-none ${
-                errors.name ? "border-errors" : "border-Deep-Violet"
+                errors.number ? "border-errors" : "border-Deep-Violet"
               }`}
               mask="9999 9999 9999 9999"
               maskChar=""
@@ -172,7 +171,9 @@ function App() {
               </h4>
               <div className="flex mt-[9px]">
                 <InputMask
-                  className="w-[72px] h-[45px] pl-4 border rounded-lg"
+                  className={`w-[72px] h-[45px] pl-4 border rounded-lg focus:outline-none ${
+                    errors.month ? "border-errors" : "border-Deep-Violet"
+                  }`}
                   mask="99"
                   maskChar=""
                   type="text"
@@ -181,7 +182,9 @@ function App() {
                 />
 
                 <InputMask
-                  className="w-[72px] h-[45px] pl-4 border rounded-lg ml-2 mr-[11px]"
+                  className={`w-[72px] h-[45px] pl-4 border rounded-lg ml-2 mr-[11px] focus:outline-none ${
+                    errors.year ? "border-errors" : "border-Deep-Violet"
+                  }`}
                   mask="99"
                   maskChar=""
                   type="text"
@@ -189,7 +192,15 @@ function App() {
                   {...register("year")}
                 />
               </div>
-              {errors.month && <p>{errors.month.message}</p>}
+              {errors.month ? (
+                <p className="mt-2 text-errors text-xs">
+                  {errors.month.message}
+                </p>
+              ) : errors.year ? (
+                <p className="mt-2 text-errors text-xs">
+                  {errors.year.message}
+                </p>
+              ) : null}
             </div>
             <div>
               <h4 className="text-Deep-Violet text-xs tracking-widest 	">CVC</h4>
@@ -214,7 +225,7 @@ function App() {
         type="submit"
         className="mt-7 w-[327px] h-[53px] text-white bg-Deep-Violet ml-6 border rounded-lg "
       >
-        Confirm
+        {complete ? "Continue" : "Confirm"}
       </button>
     </form>
   );
