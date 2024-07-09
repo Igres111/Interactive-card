@@ -17,25 +17,37 @@ type Inputs = {
 const cardRegex =
   /^(?:4[0-9]{12}(?:[0-9]{3})?|5[1-5][0-9]{14}|6(?:011|5[0-9]{2})[0-9]{12}|3[47][0-9]{13}|3(?:0[0-5]|[68][0-9])[0-9]{11}|(?:2131|1800|35\d{3})\d{11})$/;
 
+const currYear = Number(new Date().getFullYear().toString().slice(2));
+
 function App() {
   const schema = yup.object({
     name: yup
       .string()
       .required("Can’t be blank")
-      .max(30, "Can't be more digits"),
+      .max(30, "Can't be more than 30 digits"),
     number: yup
       .string()
       .required("Can’t be blank")
-      .min(16, "Number must contain 16 digits"),
+      .min(16, "Number must contain 16 digits")
+      .test("validation", "Card number must be valid", (value) =>
+        cardRegex.test(value)
+      ),
     month: yup
       .string()
       .required("Can’t be blank")
       .test(
         "range",
-        "must be valid number",
+        "Must be valid number",
         (value) => Number(value) > 0 && Number(value) <= 12
       ),
-    year: yup.string().required("Can’t be blank"),
+    year: yup
+      .string()
+      .required("Can’t be blank")
+      .test(
+        "validation",
+        "Invalid year",
+        (value) => Number(value) > currYear && Number(value) < currYear + 6
+      ),
     cvc: yup.string().required("Can’t be blank"),
   });
 
@@ -47,6 +59,7 @@ function App() {
     formState: { errors },
   } = useForm<Inputs>({ resolver: yupResolver(schema) });
   const onSubmit: SubmitHandler<Inputs> = (data) => console.log(data);
+
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="h-screen w-screen">
       <div
@@ -60,11 +73,11 @@ function App() {
           <span className="text-white text-[9px] font-medium"> 00000</span>
         </div>
         <div
-          className="bg-cover bg-center w-[285px] h-[156px] ml-[17px] absolute top-0 mt-[127px] "
+          className="bg-cover bg-center w-[285px] h-[156px] ml-[17px] absolute top-0 mt-[120px] "
           style={{ backgroundImage: `url(${front_card})` }}
         >
           <svg
-            className="ml-5 mt-4"
+            className="ml-5 mt-3"
             xmlns="http://www.w3.org/2000/svg"
             width="54"
             height="30"
@@ -91,24 +104,34 @@ function App() {
             CARDHOLDER NAME{" "}
           </h4>
           <input
-            className="mt-[9px] border rounded-lg w-[327px] h-[45px] pl-4"
+            className={`mt-[9px] border rounded-lg w-[327px] h-[45px] pl-4 focus:outline-none ${
+              errors.name ? "border-errors" : "border-Deep-Violet"
+            }`}
             type="text"
             placeholder="e.g. Jane Appleseed"
             {...register("name")}
           />
+          {errors.name && (
+            <p className="mt-2 text-errors text-xs ">{errors.name.message}</p>
+          )}
         </div>
         <div className="mt-5">
           <h4 className="text-Deep-Violet text-xs tracking-widest	">
             CARD NUMBER
           </h4>
           <InputMask
-            className="mt-[9px] border rounded-lg w-[327px] h-[45px] pl-4"
+            className={`mt-[9px] border rounded-lg w-[327px] h-[45px] pl-4 focus:outline-none ${
+              errors.name ? "border-errors" : "border-Deep-Violet"
+            }`}
             mask="9999 9999 9999 9999"
             maskChar=""
             type="string"
             placeholder="e.g. 1234 5678 9123 0000"
             {...register("number")}
           />
+          {errors.number && (
+            <p className="mt-2 text-errors text-xs">{errors.number.message}</p>
+          )}
         </div>
         <div className="mt-5 flex ">
           <div className="flex flex-col">
@@ -124,26 +147,33 @@ function App() {
                 placeholder="MM"
                 {...register("month")}
               />
+
               <InputMask
                 className="w-[72px] h-[45px] pl-4 border rounded-lg ml-2 mr-[11px]"
-                mask="9999"
+                mask="99"
                 maskChar=""
                 type="text"
                 placeholder="YY"
                 {...register("year")}
               />
             </div>
+            {errors.month && <p>{errors.month.message}</p>}
           </div>
           <div>
             <h4 className="text-Deep-Violet text-xs tracking-widest	">CVC</h4>
             <InputMask
-              className="border rounded-lg mt-[9px] w-[164px] h-[45px] pl-4"
+              className={`border rounded-lg mt-[9px] w-[164px] h-[45px] pl-4 ${
+                errors.name ? "border-errors" : "border-Deep-Violet"
+              }`}
               mask="999"
               maskChar=""
               type="text"
               placeholder="e.g. 123"
               {...register("cvc")}
             />
+            {errors.cvc && (
+              <p className="mt-2 text-errors text-xs">{errors.cvc.message}</p>
+            )}
           </div>
         </div>
       </div>

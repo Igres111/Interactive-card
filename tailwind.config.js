@@ -5,6 +5,7 @@ export default {
     extend: {
       colors: {
         "Deep-Violet": "hsl(278, 68%, 11%)",
+        errors: "hsl(0, 100%, 66%)",
       },
     },
   },
