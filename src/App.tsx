@@ -1,5 +1,6 @@
 import { useState } from "react";
 import bg_mobile from "/images/bg-main-mobile.png";
+import bg_desktop from "/images/bg-main-desktop.png";
 import back_card from "/images/bg-card-back.png";
 import front_card from "/images/bg-card-front.png";
 import { SubmitHandler, useForm } from "react-hook-form";
@@ -7,6 +8,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import InputMask from "react-input-mask";
 import Congrats from "./Congrats";
+import { useMediaQuery } from "@uidotdev/usehooks";
 type Inputs = {
   name: string;
   number: string;
@@ -20,6 +22,10 @@ const englishReg = /^[A-Za-z]+$/;
 
 function App() {
   const [complete, setComplete] = useState<boolean>(false);
+
+  const isExtraLargeDevice = useMediaQuery(
+    "only screen and (min-width : 1024px)"
+  );
 
   const schema = yup.object({
     name: yup
@@ -72,30 +78,29 @@ function App() {
   const month = watch("month");
   const year = watch("year");
   const cvc = watch("cvc");
-
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="h-screen w-screen">
+    <form
+      onSubmit={handleSubmit(onSubmit)}
+      className="h-screen w-screen  lg:flex  lg:items-center "
+    >
       <div
-        className="bg-cover bg-center h-[240px] pt-8  "
-        style={{ backgroundImage: `url(${bg_mobile})` }}
+        className="bg-cover bg-center h-[240px]  lg:w-[483px] pt-8 lg:relative lg:h-full  "
+        style={{
+          backgroundImage: `url(${
+            isExtraLargeDevice ? bg_desktop : bg_mobile
+          })`,
+        }}
       >
         <div
-          className="bg-cover bg-center w-[286px] h-[157px] ml-[73px] pr-[36px] flex items-center justify-end"
+          className="bg-cover bg-center w-[286px] lg:w-[447px] h-[157px] lg:h-[245px] ml-[73px] pr-[36px] flex items-center justify-end lg:absolute bottom-[186px]  right-[-223px] "
           style={{ backgroundImage: `url(${back_card})` }}
         >
-          {!cvc ? (
-            <span className="text-white text-[9px] font-medium tracking-widest	">
-              000
-            </span>
-          ) : (
-            <span className="text-white text-[9px] font-medium tracking-widest	">
-              {" "}
-              {cvc}
-            </span>
-          )}
+          <span className="text-white text-[9px] font-medium tracking-widest	">
+            {!cvc ? "000" : cvc}
+          </span>
         </div>
         <div
-          className="bg-cover bg-center w-[285px] h-[156px] ml-[17px] absolute top-0 mt-[120px] "
+          className="bg-cover bg-center w-[285px] lg:w-[447px] h-[156px] lg:h-[245px] ml-[17px] absolute mt-[120px] lg:top-[125px] lg:ml-[164px] "
           style={{ backgroundImage: `url(${front_card})` }}
         >
           <svg
@@ -127,111 +132,119 @@ function App() {
           </div>
         </div>
       </div>
-      {complete ? (
-        <Congrats />
-      ) : (
-        <div className="ml-6">
-          <div className="mt-[91px]">
-            <h4 className="text-Deep-Violet text-xs tracking-widest	">
-              CARDHOLDER NAME{" "}
-            </h4>
-            <input
-              className={`mt-[9px] border rounded-lg w-[327px] h-[45px] pl-4 focus:outline-Deep-Violet ${
-                errors.name ? "border-errors" : "border-Deep-Violet"
-              }`}
-              type="text"
-              placeholder="e.g. Jane Appleseed"
-              {...register("name")}
-            />
-            {errors.name && (
-              <p className="mt-2 text-errors text-xs ">{errors.name.message}</p>
-            )}
-          </div>
-          <div className="mt-5">
-            <h4 className="text-Deep-Violet text-xs tracking-widest	">
-              CARD NUMBER
-            </h4>
-            <InputMask
-              className={`mt-[9px] border rounded-lg w-[327px] h-[45px] pl-4 focus:outline-none ${
-                errors.number ? "border-errors" : "border-Deep-Violet"
-              }`}
-              mask="9999 9999 9999 9999"
-              maskChar=""
-              type="string"
-              placeholder="e.g. 1234 5678 9123 0000"
-              {...register("number")}
-            />
-            {errors.number && (
-              <p className="mt-2 text-errors text-xs">
-                {errors.number.message}
-              </p>
-            )}
-          </div>
-          <div className="mt-5 flex ">
-            <div className="flex flex-col">
+      <div className="lg:pl-[343px]">
+        {complete ? (
+          <Congrats />
+        ) : (
+          <div className="ml-6">
+            <div className="mt-[91px]">
               <h4 className="text-Deep-Violet text-xs tracking-widest	">
-                EXP. DATE (MM/YY)
+                CARDHOLDER NAME{" "}
               </h4>
-              <div className="flex mt-[9px]">
-                <InputMask
-                  className={`w-[72px] h-[45px] pl-4 border rounded-lg focus:outline-none ${
-                    errors.month ? "border-errors" : "border-Deep-Violet"
-                  }`}
-                  mask="99"
-                  maskChar=""
-                  type="text"
-                  placeholder="MM"
-                  {...register("month")}
-                />
-
-                <InputMask
-                  className={`w-[72px] h-[45px] pl-4 border rounded-lg ml-2 mr-[11px] focus:outline-none ${
-                    errors.year ? "border-errors" : "border-Deep-Violet"
-                  }`}
-                  mask="99"
-                  maskChar=""
-                  type="text"
-                  placeholder="YY"
-                  {...register("year")}
-                />
-              </div>
-              {errors.month ? (
-                <p className="mt-2 text-errors text-xs">
-                  {errors.month.message}
-                </p>
-              ) : errors.year ? (
-                <p className="mt-2 text-errors text-xs">
-                  {errors.year.message}
-                </p>
-              ) : null}
-            </div>
-            <div>
-              <h4 className="text-Deep-Violet text-xs tracking-widest 	">CVC</h4>
-              <InputMask
-                className={`border rounded-lg mt-[9px] w-[164px] h-[45px] pl-4 focus:outline-none ${
-                  errors.cvc ? "border-errors" : "border-Deep-Violet"
+              <input
+                className={`mt-[9px] border rounded-lg w-[327px] h-[45px] pl-4 focus:outline-Deep-Violet ${
+                  errors.name ? "border-errors" : "border-Deep-Violet"
                 }`}
-                mask="999"
-                maskChar=""
                 type="text"
-                placeholder="e.g. 123"
-                {...register("cvc")}
+                placeholder="e.g. Jane Appleseed"
+                {...register("name")}
               />
-              {errors.cvc && (
-                <p className="mt-2 text-errors text-xs">{errors.cvc.message}</p>
+              {errors.name && (
+                <p className="mt-2 text-errors text-xs ">
+                  {errors.name.message}
+                </p>
               )}
             </div>
+            <div className="mt-5">
+              <h4 className="text-Deep-Violet text-xs tracking-widest	">
+                CARD NUMBER
+              </h4>
+              <InputMask
+                className={`mt-[9px] border rounded-lg w-[327px] h-[45px] pl-4 focus:outline-none ${
+                  errors.number ? "border-errors" : "border-Deep-Violet"
+                }`}
+                mask="9999 9999 9999 9999"
+                maskChar=""
+                type="string"
+                placeholder="e.g. 1234 5678 9123 0000"
+                {...register("number")}
+              />
+              {errors.number && (
+                <p className="mt-2 text-errors text-xs">
+                  {errors.number.message}
+                </p>
+              )}
+            </div>
+            <div className="mt-5 flex ">
+              <div className="flex flex-col">
+                <h4 className="text-Deep-Violet text-xs tracking-widest	">
+                  EXP. DATE (MM/YY)
+                </h4>
+                <div className="flex mt-[9px]">
+                  <InputMask
+                    className={`w-[72px] h-[45px] pl-4 border rounded-lg focus:outline-none ${
+                      errors.month ? "border-errors" : "border-Deep-Violet"
+                    }`}
+                    mask="99"
+                    maskChar=""
+                    type="text"
+                    placeholder="MM"
+                    {...register("month")}
+                  />
+
+                  <InputMask
+                    className={`w-[72px] h-[45px] pl-4 border rounded-lg ml-2 mr-[11px] focus:outline-none ${
+                      errors.year ? "border-errors" : "border-Deep-Violet"
+                    }`}
+                    mask="99"
+                    maskChar=""
+                    type="text"
+                    placeholder="YY"
+                    {...register("year")}
+                  />
+                </div>
+                {errors.month ? (
+                  <p className="mt-2 text-errors text-xs">
+                    {errors.month.message}
+                  </p>
+                ) : errors.year ? (
+                  <p className="mt-2 text-errors text-xs">
+                    {errors.year.message}
+                  </p>
+                ) : null}
+              </div>
+              <div>
+                <h4 className="text-Deep-Violet text-xs tracking-widest 	">
+                  CVC
+                </h4>
+                <InputMask
+                  className={`border rounded-lg mt-[9px] w-[164px] h-[45px] pl-4 focus:outline-none ${
+                    errors.cvc ? "border-errors" : "border-Deep-Violet"
+                  }`}
+                  mask="999"
+                  maskChar=""
+                  type="text"
+                  placeholder="e.g. 123"
+                  {...register("cvc")}
+                />
+                {errors.cvc && (
+                  <p className="mt-2 text-errors text-xs">
+                    {errors.cvc.message}
+                  </p>
+                )}
+              </div>
+            </div>
           </div>
-        </div>
-      )}
-      {!complete && (
-        <button
-          type="submit"
-          className="mt-7 w-[327px] h-[53px] text-white bg-Deep-Violet ml-6 border rounded-lg "
-        >
-          Confirm
-        </button>
-      )}
+        )}
+        {!complete && (
+          <button
+            type="submit"
+            className="mt-7 w-[327px] h-[53px] text-white bg-Deep-Violet ml-6 border rounded-lg "
+          >
+            Confirm
+          </button>
+        )}
+      </div>
     </form>
   );
 }
