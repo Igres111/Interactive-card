@@ -92,10 +92,10 @@ function App() {
         }}
       >
         <div
-          className="bg-cover bg-center w-[286px] lg:w-[447px] h-[157px] lg:h-[245px] ml-[73px] pr-[36px] flex items-center justify-end lg:absolute bottom-[186px]  right-[-223px] "
+          className="bg-cover bg-center w-[286px] lg:w-[447px] h-[157px] lg:h-[245px] ml-[73px] pr-[36px] lg:pr-[57px] flex items-center justify-end lg:absolute bottom-[186px]  right-[-223px] "
           style={{ backgroundImage: `url(${back_card})` }}
         >
-          <span className="text-white text-[9px] font-medium tracking-widest	">
+          <span className="text-white text-[9px] font-medium tracking-widest lg:text-[14px] ">
             {!cvc ? "000" : cvc}
           </span>
         </div>
@@ -118,15 +118,15 @@ function App() {
             />
           </svg>
 
-          <p className="pt-[37px] ml-5 text-white tracking-widest">
+          <p className="pt-[37px] lg:pt-[64px] ml-5 lg:ml-8 text-white tracking-widest lg:text-[28px]">
             {!number ? "0000 0000 0000 0000" : number}
           </p>
-          <div className="flex justify-between pt-4 text-[9px] font-medium text-white">
-            <p className="ml-5 tracking-widest">
+          <div className="flex justify-between pt-4 lg:pt-[40px] text-[9px] font-medium text-white lg:text-[14px]">
+            <p className="ml-5 tracking-widest lg:ml-8">
               {!name ? "JANE APPLESEED" : name.toUpperCase()}
             </p>
 
-            <p className="mr-5 tracking-widest">
+            <p className="mr-5 tracking-widest lg:mr-[26px]">
               {month ? month : "00"}/{year ? year : "00"}
             </p>
           </div>
