@@ -1,5 +1,3 @@
-import React from "react";
-
 function Congrats() {
   return (
     <div className="flex flex-col justify-center items-center mt-[97px]">

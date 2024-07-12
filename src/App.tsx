@@ -69,7 +69,7 @@ function App() {
     watch,
     formState: { errors },
   } = useForm<Inputs>({ resolver: yupResolver(schema) });
-  const onSubmit: SubmitHandler<Inputs> = (data) => {
+  const onSubmit: SubmitHandler<Inputs> = () => {
     setComplete((value) => !value);
   };
   const name = watch("name");
