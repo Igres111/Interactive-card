@@ -65,7 +65,6 @@ function App() {
 
   const {
     register,
-    setValue,
     handleSubmit,
     watch,
     formState: { errors },
