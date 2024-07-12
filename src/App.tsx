@@ -99,7 +99,7 @@ function App() {
           </span>
         </div>
         <div
-          className="bg-cover bg-center w-[285px] lg:w-[447px] h-[156px] lg:h-[245px] ml-[17px] absolute top-[120px] lg:top-[125px] lg:ml-[164px] "
+          className="bg-cover bg-center w-[285px] lg:w-[447px] h-[156px] lg:h-[245px] ml-[17px] absolute top-[120px] lg:top-[225px] lg:ml-[164px] "
           style={{ backgroundImage: `url(${front_card})` }}
         >
           <svg
